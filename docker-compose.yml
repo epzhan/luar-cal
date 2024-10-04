@@ -1,0 +1,47 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Frontend/Core.web/Dockerfile
+      args:
+        - API_URL=${API_URL}
+        - REST_API_URL=${REST_API_URL}
+    env_file:
+      - .env
+    ports:
+      - "4000:80"
+      - "4001:81"
+    depends_on:
+      - backend
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+    networks:
+      - datalib-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
+      args:
+        - NUGET_DCCUSTOMFEED_USERNAME=${NUGET_DCCUSTOMFEED_USERNAME}
+        - NUGET_DCCUSTOMFEED_PASSWORD=${NUGET_DCCUSTOMFEED_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    extra_hosts:
+      - "web-pen35.int.osram-light.com:host-gateway"
+      - "wsq-pen01.malaysia.osram-os.com:host-gateway"
+      #- "host.docker.internal:host-gateway"
+    networks:
+      - datalib-network
+
+networks:
+  datalib-network:
+    name: datalib-network
+    driver: bridge
+    # ipam:
+    #   config:
+    #     - subnet: 192.168.1.0/24
+    
